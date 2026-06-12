@@ -2,21 +2,48 @@ package org.example;
 
 import org.example.model.*;
 
-import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.io.File;
 
 public class Main {
+    // i will remove the library but i will think about what to do with it later
     static int libraryId = ((int) (Math.random() * 500000));
     static Scanner scanner = new Scanner(System.in);
 
     static void main() {
-        Person teacher = new Teachers();
-//        Students student = new Students();
-//        Person librarian = new Librarian();
         Library library = new Library();
+        ShelvesByGenre computerScienceBooks = new ShelvesByGenre("computer science", 1);
+        ShelvesByGenre scienceFictionBooks = new ShelvesByGenre("science fictions", 1);
+
+        //here we are going to create the books objects, and we are not using setters for is borrowed
+        //because we can just change it anytime
+
+        // Computer Science Books
+        Book book1 = new Book("The Pragmatic Programmer", "Andrew Hunt", "Computer Science");
+        Book book2 = new Book("Clean Code", "Robert C. Martin", "Computer Science");
+        Book book3 = new Book("Structure and Interpretation of Computer Programs", "Harold Abelson", "Computer Science");
+        // Science Fiction Books
+        Book book4 = new Book("Dune", "Frank Herbert", "Science Fiction");
+        Book book5 = new Book("Neuromancer", "William Gibson", "Science Fiction");
+        Book book6 = new Book("The Left Hand of Darkness", "Ursula K. Le Guin", "Science Fiction");
+
+        //here we are going to add the books to teh shelves
+        //here we are going to add the computer science books first
+        computerScienceBooks.getBooks().add(book1);
+        computerScienceBooks.getBooks().add(book2);
+        computerScienceBooks.getBooks().add(book3);
+        //here we are going to add science fiction books
+        scienceFictionBooks.getBooks().add(book4);
+        scienceFictionBooks.getBooks().add(book5);
+        scienceFictionBooks.getBooks().add(book6);
+
+        //here we are going to be adding the shelves to the library
+        //here we're adding the shelves but inside the shelves we now have multiple books in the shelves values as a list
+        library.getShelves().put("computer science", computerScienceBooks);
+        library.getShelves().put("science fiction", scienceFictionBooks);
+
+
         while (true) {
             System.out.println("==================================================");
             System.out.println("      WELCOME TO DECATRON LIBRARY SYSTEM");
@@ -38,7 +65,7 @@ public class Main {
         scanner.close();
     }
 
-    public static void mainMenu( Library library) {
+    public static void mainMenu(Library library) {
 
         System.out.println("=================================================");
         System.out.println("       DECAGON  LIBRARY MANAGEMENT SYSTEM");
@@ -52,16 +79,16 @@ public class Main {
 
         switch (option) {
             case "1":
-                createAccountMenu( library);
+                createAccountMenu(library);
                 break;
             case "2":
-                loginMenu( library);
+                loginMenu(library);
             default:
                 System.out.println("thanks for coming you are free to visit another time");
         }
     }
 
-    public static void loginMenu( Library library) {
+    public static void loginMenu(Library library) {
         System.out.println("=================================================");
         System.out.println("               LOGIN                            |");
         System.out.println("=================================================");
@@ -79,20 +106,54 @@ public class Main {
 
     //this is the login method
     public static void studentLogin(Library library) {
-        System.out.print("LIBRARY-ID: ");
-        int libraryId = scanner.nextInt();
-        scanner.nextLine();
+        System.out.print("EMAIL: ");
+        String email = scanner.nextLine().strip().toLowerCase();
         System.out.print("PASSWORD: ");
         String password = scanner.nextLine().strip().toLowerCase();
-        if (library.loginStudentAccount(libraryId, password)) {
-            String fullname = (library.getStudents().get(libraryId).getFirstname() + " " + library.getStudents().get(libraryId).getLastname());
-            System.out.println("welcome: " + fullname);
+        if (library.loginStudentAccount(email, password)) {
+            String studentName = (library.getStudents().get(email).getFirstname() + " " + library.getStudents().get(email).getLastname());
+            System.out.println(" WELCOME: " + library.getStudents().get(email).getTitle() + " " + studentName);
+
+            System.out.println("=================================================");
+            System.out.println("               DO YOU WANT TO BORROW A BOOK");
+            System.out.println("=================================================");
+            System.out.println("1. yes");
+            System.out.println("2. exit");
+            System.out.print("Enter Option: ");
+            String option = scanner.nextLine().strip().toLowerCase();
+            if (option.equals("1")) {
+                System.out.print("BOOK-NAME: ");
+                String bookName = scanner.nextLine().strip().toLowerCase();
+                System.out.print("BOOK-GENRE: ");
+                String bookGenre = scanner.nextLine().strip().toLowerCase();
+                borrowBook(bookName, bookGenre, library);
+            } else {
+                System.out.println("operation has been cancelled successfully");
+            }
 
         }
     }
 
-    public static void createAccountMenu( Library library) {
+    public static void borrowBook(String bookName, String bookGenre, Library library) {
+        if (library.borrowBook(bookName, bookGenre)) {
+            boolean bookBorrowed = false;
+            for (Book theBookName : library.getShelves().get(bookGenre).getBooks()) {
+                if (theBookName.getBookName().equals(bookName)) {
+                    theBookName.setBorrowed(true);
+                    bookBorrowed = true;
+                    break;
+                }
+            }
+            if (bookBorrowed) {
+                System.out.println("this book has been borrowed successfully");
+            }
+        } else {
+            System.out.println("book has been borrowed or invalid book name and genre ");
+        }
 
+    }
+
+    public static void createAccountMenu(Library library) {
 
         System.out.println("=================================================");
         System.out.println("               CREATE ACCOUNT");
@@ -114,11 +175,10 @@ public class Main {
                 System.out.println("thanks for coming you are free to visit another time");
                 break;
         }
-
     }
     //this is the method that creates the students account
 
-    public static void createAccountStudent( Library library) {
+    public static void createAccountStudent(Library library) {
         Map<String, String> userFields = new HashMap<>();
         // this will take in all the user fields or properties
         System.out.print("FIRSTNAME: ");
@@ -144,22 +204,14 @@ public class Main {
         userFields.put("title", title);
 
         if (library.createAccount(userFields)) {
-            //for every loop this will create a new random number;
-            //i am still thinking of putting this up but i think this is the best place
-            //so here we are adding the properties now to the object through the setters
-//            student.setFirstname(firstname);
-//            student.setLastname(lastname);
-//            student.setEmail(email);
-//            student.setPassword(password);
-//            student.setTitle(title);
-//            student.setLibraryId(libraryId);
+            //i will still use setters for this because what if the constructors become longer
+            //but for now i will use setters
 
-            //now we want to put the student inside the library
-            library.getStudents().put(libraryId, new Students(firstname,lastname,email,password,title,libraryId));
+            library.getStudents().put(email, new Students(firstname, lastname, email, password, title, libraryId));
             System.out.println("student have been added succesfully");
             System.out.println("LIBRARY-ID: " + libraryId);
             System.out.println("LIST OF STUDENTS IN THE LIBRARY");
-            for (Person libraryStudentNames : library.getStudents().values()) {
+            for (Students libraryStudentNames : library.getStudents().values()) {
                 //this will get the values which are the student objects, and it will begin to print it one after the other
                 //until it prints the last one
                 System.out.println(libraryStudentNames.getFirstname() + " " + libraryStudentNames.getLastname());
@@ -168,7 +220,7 @@ public class Main {
         }
     }
 
-    public static void createAccountTeacher(Person teacher, Map<String, String> userFields, Library library) {
+    public static void createAccountTeacher(Library library) {
 
     }
 

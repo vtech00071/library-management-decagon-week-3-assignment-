@@ -1,5 +1,5 @@
 package org.example.util;
 
 public interface LoginServices {
-    public boolean loginStudentAccount(int libraryId,String password);
+    public boolean loginStudentAccount(String email,String password);
 }

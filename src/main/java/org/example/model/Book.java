@@ -2,15 +2,19 @@ package org.example.model;
 
 public class Book {
     private final String bookName;
-    private final String bookAuthor;
-    private final String bookGenre;
-    private final boolean isBorrowed;
+    private final  String bookAuthor;
+    private final  String bookGenre;
+    private boolean isBorrowed = false;
 
-    public Book(String bookName, String bookAuthor, String bookGenre, boolean isBorrowed) {
+    public Book(String bookName, String bookAuthor, String bookGenre) {
         this.bookName = bookName;
         this.bookAuthor = bookAuthor;
         this.bookGenre = bookGenre;
-        this.isBorrowed = isBorrowed;
+
+    }
+
+    public void setBorrowed(boolean borrowed) {
+        isBorrowed = borrowed;
     }
 
     public String getBookName() {

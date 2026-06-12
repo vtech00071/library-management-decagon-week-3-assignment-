@@ -5,12 +5,14 @@ import org.example.util.LoginServices;
 
 import java.util.*;
 
-public class Library implements LoginServices , CreateAccountServices {
+public class Library implements LoginServices, CreateAccountServices {
 
-    private Set<Librarian> librarians;
-    private Map<Integer, Person> students;
-    private List<Book> books;
-    private Map<String, Person> teacher;
+    //all this is compsotion i want it to has a
+    private final Set<Librarian> librarians;
+    private final Map<String, Students> students;
+    private final List<Book> books;
+    private final Map<String, Teachers> teacher;
+    private final Map<String, ShelvesByGenre> shelves;
 
     //this is a constructor
     public Library() {
@@ -18,13 +20,20 @@ public class Library implements LoginServices , CreateAccountServices {
         this.students = new HashMap<>();
         this.books = new ArrayList<>();
         this.teacher = new HashMap<>();
+        this.shelves = new HashMap<>();
+    }
+
+
+    // this are the getters with this getters we can now access all of this properties outside this class
+    public Map<String, ShelvesByGenre> getShelves() {
+        return shelves;
     }
 
     public Set<Librarian> getLibrarians() {
         return librarians;
     }
 
-    public Map<Integer, Person> getStudents() {
+    public Map<String, Students> getStudents() {
         return students;
     }
 
@@ -32,31 +41,30 @@ public class Library implements LoginServices , CreateAccountServices {
         return books;
     }
 
-    public Map<String, Person> getTeacher() {
+    public Map<String, Teachers> getTeacher() {
         return teacher;
     }
 
     //this is the method for login students
     @Override
-    public boolean loginStudentAccount(int libraryId, String password) {
-        boolean userExist = this.students.containsKey(libraryId);
+    public boolean loginStudentAccount(String email, String password) {
+        boolean userExist = this.students.containsKey(email);
         try {
             if (!userExist) {
                 System.out.println("USER NOT FOUND !!!");
                 return false;
             }
             //this either return true of false
-            return this.students.get(libraryId).getPassword().equals(password);
+            return this.students.get(email).getPassword().equals(password);
+            // we have this null pointer because what i if the email which is the key is null
         } catch (NullPointerException e) {
             System.out.println(Arrays.toString(e.getStackTrace()));
             return false;
         }
     }
+
     @Override
     public boolean createAccount(Map<String, String> userFields) {
-//            List<String> correctTitles = new ArrayList<>(List.of("mr", "mrs", "prof", "dr"));
-//        int validTitle = Collections.binarySearch(correctTitles,userFields.get("title"));
-//        String  val = correctTitles.get(validTitle);
         List<String> correctTitles = new ArrayList<>();
         correctTitles.add("mr");
         correctTitles.add("mrs");
@@ -96,6 +104,41 @@ public class Library implements LoginServices , CreateAccountServices {
             System.out.println("account creation success!!!");
             return true;
         }
+    }
+
+    public boolean borrowBook(String bookName, String bookGenre) {
+        boolean genreExist = this.shelves.containsKey(bookGenre);
+        boolean bookNameExist = false;
+        boolean isBookTaken = false;
+        for (Book theBookName : this.shelves.get(bookGenre).getBooks()) {
+            if (theBookName.getBookName().equals(bookName)) {
+                theBookName.
+                bookNameExist = true;
+                break;
+            }
+        }
+        for (Book theBookName : this.shelves.get(bookGenre).getBooks()) {
+            if (theBookName.isBorrowed()) {
+                isBookTaken = true;
+                break;
+            }
+
+        }
+        if (!genreExist) {
+            System.out.println("genre does not exist");
+            return false;
+        }
+        if (!bookNameExist) {
+            System.out.println("book does not exist");
+            return false;
+        }
+        if (!isBookTaken) {
+            System.out.println("that means this book have been taken");
+            return false;
+        }
+        System.out.println("book has been borrowed successfully ");
+        return false;
+
 
     }
 
