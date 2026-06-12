@@ -5,14 +5,18 @@ import org.example.model.*;
 import javax.xml.crypto.dsig.spec.XSLTTransformParameterSpec;
 import java.util.HashMap;
 import java.util.Map;
-
 import java.util.Scanner;
+import java.io.File;
 
 public class Main {
+    static int libraryId = ((int) (Math.random() * 500000));
     static Scanner scanner = new Scanner(System.in);
 
-
     static void main() {
+        Person teacher = new Teachers();
+//        Students student = new Students();
+//        Person librarian = new Librarian();
+        Library library = new Library();
         while (true) {
             System.out.println("==================================================");
             System.out.println("      WELCOME TO DECATRON LIBRARY SYSTEM");
@@ -25,7 +29,7 @@ public class Main {
             System.out.print("Select Option: ");
             String option = scanner.nextLine().strip().toLowerCase();
             if (option.equals("1")) {
-                mainMenu();
+                mainMenu(library);
             } else {
                 System.out.println("operation have been cancelled successfully ");
                 break;
@@ -34,12 +38,7 @@ public class Main {
         scanner.close();
     }
 
-    public static void mainMenu() {
-        Person teacher = new Teachers();
-        Person student = new Students();
-        Person librarian = new Librarian();
-        Library library = new Library();
-
+    public static void mainMenu( Library library) {
 
         System.out.println("=================================================");
         System.out.println("       DECAGON  LIBRARY MANAGEMENT SYSTEM");
@@ -53,17 +52,16 @@ public class Main {
 
         switch (option) {
             case "1":
-                createAccountMenu(teacher, student, library);
+                createAccountMenu( library);
                 break;
             case "2":
-                loginMenu(teacher, student, library);
+                loginMenu( library);
             default:
                 System.out.println("thanks for coming you are free to visit another time");
         }
-
     }
 
-    public static void loginMenu(Person teacher, Person student, Library library) {
+    public static void loginMenu( Library library) {
         System.out.println("=================================================");
         System.out.println("               LOGIN                            |");
         System.out.println("=================================================");
@@ -75,13 +73,14 @@ public class Main {
         String option = scanner.nextLine().strip().toLowerCase();
         switch (option) {
             case "1":
-                studentLogin(student, library);
+                studentLogin(library);
         }
     }
 
-    public static void studentLogin(Person student, Library library) {
+    //this is the login method
+    public static void studentLogin(Library library) {
         System.out.print("LIBRARY-ID: ");
-        int  libraryId = scanner.nextInt();
+        int libraryId = scanner.nextInt();
         scanner.nextLine();
         System.out.print("PASSWORD: ");
         String password = scanner.nextLine().strip().toLowerCase();
@@ -92,8 +91,8 @@ public class Main {
         }
     }
 
-    public static void createAccountMenu(Person teacher, Person student, Library library) {
-        Map<String, String> userFields = new HashMap<>();
+    public static void createAccountMenu( Library library) {
+
 
         System.out.println("=================================================");
         System.out.println("               CREATE ACCOUNT");
@@ -106,10 +105,10 @@ public class Main {
         String option = scanner.nextLine().strip().toLowerCase();
         switch (option) {
             case "1":
-                createAccountStudent(student, userFields, library);
+                createAccountStudent(library);
                 break;
             case "2":
-                createAccountTeacher(teacher, userFields, library);
+                createAccountTeacher(library);
                 break;
             default:
                 System.out.println("thanks for coming you are free to visit another time");
@@ -119,7 +118,8 @@ public class Main {
     }
     //this is the method that creates the students account
 
-    public static void createAccountStudent(Person student, Map<String, String> userFields, Library library) {
+    public static void createAccountStudent( Library library) {
+        Map<String, String> userFields = new HashMap<>();
         // this will take in all the user fields or properties
         System.out.print("FIRSTNAME: ");
         String firstname = scanner.nextLine().strip().toLowerCase();
@@ -143,26 +143,24 @@ public class Main {
         userFields.put("confirmPassword", confirmPassword);
         userFields.put("title", title);
 
-        if (student.createAccount(userFields)) {
+        if (library.createAccount(userFields)) {
             //for every loop this will create a new random number;
             //i am still thinking of putting this up but i think this is the best place
-            int libraryId = ((int) (Math.random() * 500000));
-
             //so here we are adding the properties now to the object through the setters
-            student.setFirstname(firstname);
-            student.setLastname(lastname);
-            student.setEmail(email);
-            student.setPassword(password);
-            student.setTitle(title);
-            student.setLibraryId(libraryId);
+//            student.setFirstname(firstname);
+//            student.setLastname(lastname);
+//            student.setEmail(email);
+//            student.setPassword(password);
+//            student.setTitle(title);
+//            student.setLibraryId(libraryId);
 
             //now we want to put the student inside the library
-            library.getStudents().put(libraryId, student);
+            library.getStudents().put(libraryId, new Students(firstname,lastname,email,password,title,libraryId));
             System.out.println("student have been added succesfully");
             System.out.println("LIBRARY-ID: " + libraryId);
             System.out.println("LIST OF STUDENTS IN THE LIBRARY");
             for (Person libraryStudentNames : library.getStudents().values()) {
-                //this will get the values which are the student objects and it will begin to print it one after the other
+                //this will get the values which are the student objects, and it will begin to print it one after the other
                 //until it prints the last one
                 System.out.println(libraryStudentNames.getFirstname() + " " + libraryStudentNames.getLastname());
                 System.out.println(libraryStudentNames.getPassword());
@@ -171,6 +169,7 @@ public class Main {
     }
 
     public static void createAccountTeacher(Person teacher, Map<String, String> userFields, Library library) {
+
     }
 
 

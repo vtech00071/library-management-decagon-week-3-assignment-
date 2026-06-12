@@ -1,19 +1,20 @@
 package org.example.model;
 
+import org.example.util.CreateAccountServices;
 import org.example.util.LoginServices;
 
 import java.util.*;
 
-public class Library implements LoginServices {
+public class Library implements LoginServices , CreateAccountServices {
 
-    Set<Librarian> librarians = new HashSet<>();
-    Map<Integer, Person> students = new HashMap<>();
-    List<Book> books = new ArrayList<>();
-    Map<String, Person> teacher = new HashMap<>();
+    private Set<Librarian> librarians;
+    private Map<Integer, Person> students;
+    private List<Book> books;
+    private Map<String, Person> teacher;
 
+    //this is a constructor
     public Library() {
         this.librarians = new HashSet<>();
-        //this hashmap will contain student objects and library id
         this.students = new HashMap<>();
         this.books = new ArrayList<>();
         this.teacher = new HashMap<>();
@@ -38,24 +39,64 @@ public class Library implements LoginServices {
     //this is the method for login students
     @Override
     public boolean loginStudentAccount(int libraryId, String password) {
-        boolean userExists = this.getStudents().containsKey(libraryId);
-        //this will check if the password is equals to the password of the object
-        // I use try catch here because of null pointer exception
+        boolean userExist = this.students.containsKey(libraryId);
         try {
-            if (!userExists) {
-                System.out.println("USER NOT FOUND XXX");
+            if (!userExist) {
+                System.out.println("USER NOT FOUND !!!");
                 return false;
             }
-            if (this.getStudents().get(libraryId).getPassword().equals(password)) {
-                System.out.println("login is successfull");
-                return true;
-            } else {
-                System.out.println("invalid password ");
-                return false;
-            }
-        } catch (NullPointerException _) {
-            System.out.println("USER NOT FOUND XXX");
+            //this either return true of false
+            return this.students.get(libraryId).getPassword().equals(password);
+        } catch (NullPointerException e) {
+            System.out.println(Arrays.toString(e.getStackTrace()));
             return false;
         }
     }
+    @Override
+    public boolean createAccount(Map<String, String> userFields) {
+//            List<String> correctTitles = new ArrayList<>(List.of("mr", "mrs", "prof", "dr"));
+//        int validTitle = Collections.binarySearch(correctTitles,userFields.get("title"));
+//        String  val = correctTitles.get(validTitle);
+        List<String> correctTitles = new ArrayList<>();
+        correctTitles.add("mr");
+        correctTitles.add("mrs");
+        correctTitles.add("prof");
+        correctTitles.add("dr");
+        String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        boolean checkNull = false;
+        for (String values : userFields.values()) {
+            if (values == null) {
+                checkNull = true;
+                break;
+            }
+        }
+        //check if values are not null
+        if (checkNull) {
+            System.out.println("the values of this fields are null");
+            return false;
+        }
+        //check if the email is a valid email
+        if (!userFields.get("email").matches(regex)) {
+            System.out.println("this email is invalid");
+            return false;
+        }
+
+        //check if the password and the confirmation password is the same
+        if (!userFields.get("password").equals(userFields.get("confirmPassword"))) {
+            System.out.println("your password does not match please try again");
+            return false;
+        }
+        //check if the title is a valid title
+        if (!correctTitles.contains(userFields.get("title"))) {
+            System.out.println("this title does not exist");
+            return false;
+        }
+        //if all the conditions are passed then the account creation will be successfull
+        else {
+            System.out.println("account creation success!!!");
+            return true;
+        }
+
+    }
+
 }
