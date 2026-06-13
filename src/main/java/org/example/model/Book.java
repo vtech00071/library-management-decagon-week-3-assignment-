@@ -4,7 +4,7 @@ public class Book {
     private final String bookName;
     private final  String bookAuthor;
     private final  String bookGenre;
-    private boolean isBorrowed = false;
+    private boolean isBorrowed;
 
     public Book(String bookName, String bookAuthor, String bookGenre) {
         this.bookName = bookName;
@@ -13,9 +13,6 @@ public class Book {
 
     }
 
-    public void setBorrowed(boolean borrowed) {
-        isBorrowed = borrowed;
-    }
 
     public String getBookName() {
         return bookName;
@@ -28,8 +25,11 @@ public class Book {
     public String getBookGenre() {
         return bookGenre;
     }
-
-    public boolean isBorrowed() {
+    public boolean getIsBorrowed() {
         return isBorrowed;
+    }
+
+    public void setBorrowed(boolean isBorrowed) {
+        this.isBorrowed = isBorrowed;
     }
 }

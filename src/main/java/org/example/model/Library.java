@@ -77,6 +77,7 @@ public class Library implements LoginServices, CreateAccountServices {
                 checkNull = true;
                 break;
             }
+            return false;
         }
         //check if values are not null
         if (checkNull) {
@@ -109,37 +110,35 @@ public class Library implements LoginServices, CreateAccountServices {
     public boolean borrowBook(String bookName, String bookGenre) {
         boolean genreExist = this.shelves.containsKey(bookGenre);
         boolean bookNameExist = false;
-        boolean isBookTaken = false;
+        boolean bookBorrowed = false;
+
         for (Book theBookName : this.shelves.get(bookGenre).getBooks()) {
             if (theBookName.getBookName().equals(bookName)) {
-                theBookName.
                 bookNameExist = true;
+                if (theBookName.getIsBorrowed()) {
+                    bookBorrowed = true;
+                } else {
+                    theBookName.setBorrowed(true);
+                    System.out.println(bookName + " " + bookGenre + " has been borrowed successfully");
+                }
                 break;
             }
-        }
-        for (Book theBookName : this.shelves.get(bookGenre).getBooks()) {
-            if (theBookName.isBorrowed()) {
-                isBookTaken = true;
-                break;
-            }
-
         }
         if (!genreExist) {
-            System.out.println("genre does not exist");
+            System.out.println("this book genre does not exist");
             return false;
         }
         if (!bookNameExist) {
-            System.out.println("book does not exist");
+            System.out.println("this book does not exist");
             return false;
         }
-        if (!isBookTaken) {
-            System.out.println("that means this book have been taken");
+        if (bookBorrowed){
+            System.out.println("this book has been taken you cannot borrow it ");
             return false;
+        }else {
+            System.out.println("book has been borrowed successfully");
+            return true;
         }
-        System.out.println("book has been borrowed successfully ");
-        return false;
-
-
     }
 
 }

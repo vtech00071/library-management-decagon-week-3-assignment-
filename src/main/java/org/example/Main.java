@@ -13,6 +13,8 @@ public class Main {
 
     static void main() {
         Library library = new Library();
+        //we have a map that takes string as key and shelves by genre as values
+        //in this shelves we have list books
         ShelvesByGenre computerScienceBooks = new ShelvesByGenre("computer science", 1);
         ShelvesByGenre scienceFictionBooks = new ShelvesByGenre("science fictions", 1);
 
@@ -20,13 +22,13 @@ public class Main {
         //because we can just change it anytime
 
         // Computer Science Books
-        Book book1 = new Book("The Pragmatic Programmer", "Andrew Hunt", "Computer Science");
-        Book book2 = new Book("Clean Code", "Robert C. Martin", "Computer Science");
-        Book book3 = new Book("Structure and Interpretation of Computer Programs", "Harold Abelson", "Computer Science");
+        Book book1 = new Book("The Pragmatic Programmer", "Andrew Hunt", "computer science");
+        Book book2 = new Book("Clean Code", "Robert C. Martin", "computer science");
+        Book book3 = new Book("Structure and Interpretation of Computer Programs", "Harold Abelson", "computer science");
         // Science Fiction Books
-        Book book4 = new Book("Dune", "Frank Herbert", "Science Fiction");
-        Book book5 = new Book("Neuromancer", "William Gibson", "Science Fiction");
-        Book book6 = new Book("The Left Hand of Darkness", "Ursula K. Le Guin", "Science Fiction");
+        Book book4 = new Book("Dune", "Frank Herbert", "science fiction");
+        Book book5 = new Book("Neuromancer", "William Gibson", "science fiction");
+        Book book6 = new Book("The Left Hand of Darkness", "Ursula K. Le Guin", "science fiction");
 
         //here we are going to add the books to teh shelves
         //here we are going to add the computer science books first
@@ -123,32 +125,22 @@ public class Main {
             String option = scanner.nextLine().strip().toLowerCase();
             if (option.equals("1")) {
                 System.out.print("BOOK-NAME: ");
-                String bookName = scanner.nextLine().strip().toLowerCase();
+                String bookName = scanner.nextLine();
                 System.out.print("BOOK-GENRE: ");
-                String bookGenre = scanner.nextLine().strip().toLowerCase();
+                String bookGenre = scanner.nextLine();
                 borrowBook(bookName, bookGenre, library);
             } else {
                 System.out.println("operation has been cancelled successfully");
             }
-
         }
     }
 
     public static void borrowBook(String bookName, String bookGenre, Library library) {
         if (library.borrowBook(bookName, bookGenre)) {
-            boolean bookBorrowed = false;
-            for (Book theBookName : library.getShelves().get(bookGenre).getBooks()) {
-                if (theBookName.getBookName().equals(bookName)) {
-                    theBookName.setBorrowed(true);
-                    bookBorrowed = true;
-                    break;
-                }
-            }
-            if (bookBorrowed) {
-                System.out.println("this book has been borrowed successfully");
-            }
-        } else {
-            System.out.println("book has been borrowed or invalid book name and genre ");
+            System.out.println("this books has been borrowed successfull");
+//
+        }else{
+            System.out.println("this book does not exist or it has been taken");
         }
 
     }
@@ -223,6 +215,4 @@ public class Main {
     public static void createAccountTeacher(Library library) {
 
     }
-
-
 }
