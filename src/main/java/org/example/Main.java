@@ -1,7 +1,7 @@
 package org.example;
 
 import org.example.model.*;
-
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -10,6 +10,7 @@ public class Main {
     // i will remove the library but i will think about what to do with it later
     static int libraryId = ((int) (Math.random() * 500000));
     static Scanner scanner = new Scanner(System.in);
+
 
     static void main() {
         Library library = new Library();
@@ -103,6 +104,41 @@ public class Main {
         switch (option) {
             case "1":
                 studentLogin(library);
+                break;
+            case "2":
+                teacherLogin(library);
+                break;
+        }
+    }
+
+    //teacher and student should use the same login how do i go about it
+    private static void teacherLogin(Library library) {
+        System.out.print("EMAIL: ");
+        String email = scanner.nextLine().strip().toLowerCase();
+        System.out.print("PASSWORD: ");
+        String password = scanner.nextLine().strip().toLowerCase();
+        if (library.loginTeachersAccount(email, password)) {
+            // with this we get to teacher map and i will use get to get it
+            String teachersName = (library.getTeacher().get(email).getFirstname() + " " + library.getTeacher().get(email).getLastname());
+            System.out.println(" WELCOME: " + library.getTeacher().get(email).getTitle() + " " + teachersName);
+
+            System.out.println("=================================================");
+            System.out.println("               DO YOU WANT TO BORROW A BOOK");
+            System.out.println("=================================================");
+            System.out.println("=================================================");
+            System.out.println("               DO YOU WANT TO REQUEST FOR A BOOK");
+            System.out.println("=================================================");
+            System.out.println("1. borrow book: ");
+            System.out.println("2. request for a book ");
+            System.out.print("Enter Option: ");
+            String option = scanner.nextLine().strip().toLowerCase();
+            if (option.equals("1")) {
+                System.out.print("BOOK-NAME: ");
+                String bookName = scanner.nextLine();
+                System.out.print("BOOK-GENRE: ");
+                String bookGenre = scanner.nextLine();
+                borrowBook(bookName, bookGenre, library);
+            }
         }
     }
 
@@ -113,8 +149,8 @@ public class Main {
         System.out.print("PASSWORD: ");
         String password = scanner.nextLine().strip().toLowerCase();
         if (library.loginStudentAccount(email, password)) {
-            String studentName = (library.getStudents().get(email).getFirstname() + " " + library.getStudents().get(email).getLastname());
-            System.out.println(" WELCOME: " + library.getStudents().get(email).getTitle() + " " + studentName);
+            String user = (library.getStudents().get(email).getFirstname() + " " + library.getStudents().get(email).getLastname());
+            System.out.println(" WELCOME: " + library.getStudents().get(email).getTitle() + " " + user);
 
             System.out.println("=================================================");
             System.out.println("               DO YOU WANT TO BORROW A BOOK");
@@ -123,14 +159,27 @@ public class Main {
             System.out.println("2. exit");
             System.out.print("Enter Option: ");
             String option = scanner.nextLine().strip().toLowerCase();
+            //this is the borrow method that i used before i will remove it immediate i am done with the
+            //request and the first and first serve
             if (option.equals("1")) {
                 System.out.print("BOOK-NAME: ");
                 String bookName = scanner.nextLine();
                 System.out.print("BOOK-GENRE: ");
                 String bookGenre = scanner.nextLine();
                 borrowBook(bookName, bookGenre, library);
-            } else {
-                System.out.println("operation has been cancelled successfully");
+            } else if (option.equals("2")) {
+                //in this place i am adding the user request i am not yet done
+                //it remains the serving book logic
+                //but where does priority queue comes in
+                String timestamps = LocalDateTime.now().toString();
+                System.out.print("BOOK-NAME: ");
+                String bookName = scanner.nextLine();
+                System.out.print("BOOK-GENRE: ");
+                String bookGenre = scanner.nextLine();
+              if (library.requestBook(bookName, bookGenre)){
+                  library.getRequestBook().offer(new RequestObject(user,timestamps,bookName));
+                  System.out.println(bookName + " has been requested successfully " );
+              }
             }
         }
     }
@@ -139,7 +188,7 @@ public class Main {
         if (library.borrowBook(bookName, bookGenre)) {
             System.out.println("this books has been borrowed successfull");
 //
-        }else{
+        } else {
             System.out.println("this book does not exist or it has been taken");
         }
 
@@ -168,8 +217,13 @@ public class Main {
                 break;
         }
     }
+
+    private static void createAccountTeacher(Library library) {
+    }
     //this is the method that creates the students account
 
+
+    //this method is for the student account creation and teacher account creation
     public static void createAccountStudent(Library library) {
         Map<String, String> userFields = new HashMap<>();
         // this will take in all the user fields or properties
@@ -185,6 +239,8 @@ public class Main {
         String confirmPassword = scanner.nextLine().strip().toLowerCase();
         System.out.print("TITLE: ");
         String title = scanner.nextLine().strip().toLowerCase();
+        System.out.print("choose T for teacher and S for student: ");
+        String teacherOrStudent = scanner.nextLine().strip().toLowerCase();
 
         //then here we are going to load all those user fields into an hashmap
 
@@ -198,21 +254,32 @@ public class Main {
         if (library.createAccount(userFields)) {
             //i will still use setters for this because what if the constructors become longer
             //but for now i will use setters
+            if (teacherOrStudent.equals("s")) {
 
-            library.getStudents().put(email, new Students(firstname, lastname, email, password, title, libraryId));
-            System.out.println("student have been added succesfully");
-            System.out.println("LIBRARY-ID: " + libraryId);
-            System.out.println("LIST OF STUDENTS IN THE LIBRARY");
-            for (Students libraryStudentNames : library.getStudents().values()) {
-                //this will get the values which are the student objects, and it will begin to print it one after the other
-                //until it prints the last one
-                System.out.println(libraryStudentNames.getFirstname() + " " + libraryStudentNames.getLastname());
-                System.out.println(libraryStudentNames.getPassword());
+                library.getStudents().put(email, new Students(firstname, lastname, email, password, title, libraryId));
+                System.out.println("student have been added succesfully");
+                System.out.println("LIBRARY-ID: " + libraryId);
+                System.out.println("LIST OF STUDENTS IN THE LIBRARY");
+                for (Students libraryStudentNames : library.getStudents().values()) {
+                    //this will get the values which are the student objects, and it will begin to print it one after the other
+                    //until it prints the last one
+                    System.out.println(libraryStudentNames.getFirstname() + " " + libraryStudentNames.getLastname());
+                    System.out.println(libraryStudentNames.getPassword());
+                }
+            } else if (teacherOrStudent.equals("t")) {
+                library.getTeacher().put(email, new Teachers(firstname, lastname, email, password, title, libraryId));
+                System.out.println("teachers have been added succesfully");
+                System.out.println("LIBRARY-ID: " + libraryId);
+                System.out.println("LIST OF TEACHERS IN THE LIBRARY");
+                for (Teachers libraryTeacherNames : library.getTeacher().values()) {
+                    //this will get the values which are the student objects, and it will begin to print it one after the other
+                    //until it prints the last one
+                    System.out.println(libraryTeacherNames.getFirstname() + " " + libraryTeacherNames.getLastname());
+                    System.out.println(libraryTeacherNames.getPassword());
+                }
+
             }
         }
     }
-
-    public static void createAccountTeacher(Library library) {
-
-    }
 }
+

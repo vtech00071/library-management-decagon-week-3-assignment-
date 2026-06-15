@@ -11,9 +11,4 @@ public class Teachers extends Person{
     public boolean createAccount(Map<String, String> userFields) {
         return false;
     }
-//
-//    @Override
-//    public boolean loginAccount(String libraryId, String password) {
-//        return false;
-//    }
 }
