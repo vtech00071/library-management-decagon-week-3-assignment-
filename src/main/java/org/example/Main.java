@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.model.*;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -168,18 +169,30 @@ public class Main {
                 String bookGenre = scanner.nextLine();
                 borrowBook(bookName, bookGenre, library);
             } else if (option.equals("2")) {
-                //in this place i am adding the user request i am not yet done
-                //it remains the serving book logic
-                //but where does priority queue comes in
+
                 String timestamps = LocalDateTime.now().toString();
+
+                String requesterName = scanner.nextLine().strip().toLowerCase();
                 System.out.print("BOOK-NAME: ");
                 String bookName = scanner.nextLine();
                 System.out.print("BOOK-GENRE: ");
                 String bookGenre = scanner.nextLine();
-              if (library.requestBook(bookName, bookGenre)){
-                  library.getRequestBook().offer(new RequestObject(user,timestamps,bookName));
-                  System.out.println(bookName + " has been requested successfully " );
-              }
+                if (library.requestBook(bookName, bookGenre)) {
+                    //so what this means is that it is book name that is going enter i didnt but if
+                    //you check the stuffs you will see book
+                    library.getRequestBook().offer(new RequestObject(requesterName, timestamps, bookName, bookGenre));
+                    System.out.println(bookName + " has been requested successfully ");
+
+                    //i am just testing this here i will still refactor the code
+                    //but is still the librarian that will serve the book
+                    //so this is not the final code
+
+                    System.out.print("do you want to serve the book now yes/no? : ");
+                    String question = scanner.nextLine().strip().toLowerCase();
+                    if (question.equals("yes")) {
+                      library.serveBook(requesterName,timestamps,bookName,bookGenre);
+                    }
+                }
             }
         }
     }

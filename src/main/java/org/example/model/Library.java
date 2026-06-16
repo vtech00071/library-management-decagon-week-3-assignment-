@@ -2,6 +2,7 @@ package org.example.model;
 
 import org.example.util.CreateAccountServices;
 import org.example.util.LoginServices;
+
 import java.util.*;
 
 public class Library implements LoginServices, CreateAccountServices {
@@ -49,6 +50,7 @@ public class Library implements LoginServices, CreateAccountServices {
     public Queue<RequestObject> getRequestBook() {
         return requestBook;
     }
+
     //how many times does a book name apear in a object
     public boolean requestBook(String bookName, String bookGenre) {
         boolean genreExist = this.shelves.containsKey(bookGenre);
@@ -61,7 +63,7 @@ public class Library implements LoginServices, CreateAccountServices {
                 if (theBookName.getIsBorrowed()) {
                     bookBorrowed = true;
                 } else {
-                    theBookName.setBorrowed(true);
+//                    theBookName.setBorrowed(true);
                     System.out.println(bookName + " " + bookGenre + " has been borrowed successfully");
                 }
                 break;
@@ -84,6 +86,32 @@ public class Library implements LoginServices, CreateAccountServices {
         }
     }
 
+    //this is the method that we will use to serve the book
+    public void serveBook() {
+        //this while means this loop will keep running until the books everything is not in the
+        while (!this.requestBook.isEmpty()) {
+            boolean bookFound = false;
+            RequestObject theMainBook = this.requestBook.peek();
+            if (this.shelves.containsKey(theMainBook.getBookGenre())){
+                for (Book theBook: this.shelves.get(theMainBook.getBookGenre()).getBooks()){
+                    if (theBook.getBookName().equals(theMainBook.getBookName())){
+                        bookFound = true;
+                        theBook.setBorrowed(true);
+                        RequestObject removeBook = this.requestBook.poll();
+                        System.out.println(removeBook + "has been removed ");
+                    }
+                }
+                if (!bookFound){
+                    this.requestBook.poll();
+                }
+            }else {
+                this.requestBook.poll();
+                System.out.println("this first book that you request does not exist");
+            }
+
+        }
+    }
+
     //this is the method for login students
     @Override
     public boolean loginStudentAccount(String email, String password) {
@@ -94,6 +122,7 @@ public class Library implements LoginServices, CreateAccountServices {
                 return false;
             }
             //this either return true of false
+            //this is directly to the student so its not to list that is why  i did it like this
             return this.students.get(email).getPassword().equals(password);
             // we have this null pointer because what i if the email which is the key is null
         } catch (NullPointerException e) {
@@ -197,7 +226,4 @@ public class Library implements LoginServices, CreateAccountServices {
             return true;
         }
     }
-
-
-
 }
