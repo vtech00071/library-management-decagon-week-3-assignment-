@@ -6,23 +6,31 @@ import org.example.util.LoginServices;
 import java.util.*;
 
 public class Library implements LoginServices, CreateAccountServices {
-
-    //all this is compsotion i want it to has a
-    private final Set<Librarian> librarians;
+    private final Map<String, Librarian> librarians;
     private final Map<String, Students> students;
     private final List<Book> books;
     private final Map<String, Teachers> teacher;
     private final Map<String, ShelvesByGenre> shelves;
-    private final Queue<RequestObject> requestBook;
+    static int arrivalCounter = 0;
+    private final PriorityQueue<RequestObject> requestBook = new PriorityQueue<>(
+            (a, b) -> {
+                if (a.getPriority() != b.getPriority()) {
+                    return a.getPriority() - b.getPriority();
+                } else {
+                    return a.getArrivalCounter() - b.getArrivalCounter();
+                }
+            }
+    );
+
 
     //this is a constructor
     public Library() {
-        this.librarians = new HashSet<>();
+        this.librarians = new HashMap<>();
         this.students = new HashMap<>();
         this.books = new ArrayList<>();
         this.teacher = new HashMap<>();
         this.shelves = new HashMap<>();
-        this.requestBook = new LinkedList<>();
+        //this is the priority queue
     }
 
     // this are the getters with this getters we can now access all of this properties outside this class
@@ -30,7 +38,7 @@ public class Library implements LoginServices, CreateAccountServices {
         return shelves;
     }
 
-    public Set<Librarian> getLibrarians() {
+    public Map<String, Librarian> getLibrarians() {
         return librarians;
     }
 
@@ -47,12 +55,15 @@ public class Library implements LoginServices, CreateAccountServices {
     }
 
     //this will allow will allow us to get the this queue and use it in the main function
-    public Queue<RequestObject> getRequestBook() {
+
+
+    public PriorityQueue<RequestObject> getRequestBook() {
         return requestBook;
     }
 
-    //how many times does a book name apear in a object
-    public boolean requestBook(String bookName, String bookGenre) {
+    //this will check whether the requested book is available
+    //have not yet use this time stamp now i will use it later
+    public void requestBook(String requesterEmail, String bookName, String bookGenre, String studentOrTeacher) {
         boolean genreExist = this.shelves.containsKey(bookGenre);
         boolean bookNameExist = false;
         boolean bookBorrowed = false;
@@ -63,8 +74,7 @@ public class Library implements LoginServices, CreateAccountServices {
                 if (theBookName.getIsBorrowed()) {
                     bookBorrowed = true;
                 } else {
-//                    theBookName.setBorrowed(true);
-                    System.out.println(bookName + " " + bookGenre + " has been borrowed successfully");
+                    System.out.println(bookName + " " + bookGenre + " has been requested successfully");
                 }
                 break;
             }
@@ -72,41 +82,58 @@ public class Library implements LoginServices, CreateAccountServices {
         // i used all this one because of the if else statement
         if (!genreExist) {
             System.out.println("this book genre does not exist");
-            return false;
         }
         if (!bookNameExist) {
             System.out.println("this book does not exist");
-            return false;
         }
         if (bookBorrowed) {
             System.out.println("this book has been taken you cannot borrow it ");
-            return false;
+
         } else {
-            return true;
+
+            System.out.println("this book have been added successfully ");
+            addRequestBook(studentOrTeacher, requesterEmail, bookName, bookGenre);
         }
     }
 
+    public void addRequestBook(String studentOrTeacher, String requesterEmail, String bookName, String bookGenre) {
+        //enhanced switch
+        arrivalCounter += 1;
+        if (studentOrTeacher.equals("teacher")) {
+            String teacherFullName = (this.teacher.get(requesterEmail).firstname + " " + this.teacher.get(requesterEmail).lastname);
+            requestBook.offer(new RequestObject(bookName, bookGenre, teacherFullName, 1, arrivalCounter));
+        } else if (studentOrTeacher.equals("student")) {
+            String studentFullName = (this.students.get(requesterEmail).firstname + " " + this.students.get(requesterEmail).lastname);
+
+            switch (this.students.get(requesterEmail).getLevel()) {
+                case 400 ->
+                        requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 2, arrivalCounter));
+                case 300 ->
+                        requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 3, arrivalCounter));
+                case 200 ->
+                        requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 4, arrivalCounter));
+                case 100 ->
+                        requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 5, arrivalCounter));
+                default -> System.out.println("this does not exist");
+            }
+        } else {
+            System.out.println("error please try again");
+        }
+    }
+
+
     //this is the method that we will use to serve the book
-    public void serveBook() {
-        //this while means this loop will keep running until the books everything is not in the
+
+    public void serveBook(String bookName, String bookGenre) {
+        //while this loop is running
+        //it will run in the number of time the book is inside
         while (!this.requestBook.isEmpty()) {
-            boolean bookFound = false;
-            RequestObject theMainBook = this.requestBook.peek();
-            if (this.shelves.containsKey(theMainBook.getBookGenre())){
-                for (Book theBook: this.shelves.get(theMainBook.getBookGenre()).getBooks()){
-                    if (theBook.getBookName().equals(theMainBook.getBookName())){
-                        bookFound = true;
-                        theBook.setBorrowed(true);
-                        RequestObject removeBook = this.requestBook.poll();
-                        System.out.println(removeBook + "has been removed ");
-                    }
+            RequestObject theBooks = this.requestBook.poll();
+            for (Book books : this.shelves.get(bookGenre).getBooks()) {
+                //all the book will set their borrowed to true
+                if (books.getBookName().equals(bookName)) {
+                    books.setBorrowed(true);
                 }
-                if (!bookFound){
-                    this.requestBook.poll();
-                }
-            }else {
-                this.requestBook.poll();
-                System.out.println("this first book that you request does not exist");
             }
 
         }
@@ -114,7 +141,7 @@ public class Library implements LoginServices, CreateAccountServices {
 
     //this is the method for login students
     @Override
-    public boolean loginStudentAccount(String email, String password) {
+    public boolean loginAccount(String email, String password) {
         boolean userExist = this.students.containsKey(email);
         try {
             if (!userExist) {
@@ -130,6 +157,7 @@ public class Library implements LoginServices, CreateAccountServices {
             return false;
         }
     }
+
 
     //this method will work for the teachers login
     @Override
@@ -193,6 +221,8 @@ public class Library implements LoginServices, CreateAccountServices {
         }
     }
 
+
+    //this is not useful now i dont know maybe i should delete it now or not i am yet to decide
     public boolean borrowBook(String bookName, String bookGenre) {
         boolean genreExist = this.shelves.containsKey(bookGenre);
         boolean bookNameExist = false;

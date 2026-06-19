@@ -4,11 +4,11 @@ import java.util.*;
 
 public class Students extends Person {
     private String matricNumber;
-    private String level;
+    private int level;
     private String department;
 
-    public Students(String firstname, String lastname, String email, String password, String title, int libraryId) {
-        super(firstname, lastname, email, password, title, libraryId);
+    public Students(String firstname, String lastname, String email, String password, String title, int libraryId, String identity) {
+        super(firstname, lastname, email, password, title, libraryId, identity);
     }
 
     //i must still check whether the matric number is a valid one
@@ -17,7 +17,7 @@ public class Students extends Person {
     }
 
     // i must still check if the level is a valid one
-    public void setLevel(String level) {
+    public void setLevel(int level) {
         this.level = level;
     }
 
@@ -30,7 +30,7 @@ public class Students extends Person {
         return matricNumber;
     }
 
-    public String getLevel() {
+    public int getLevel() {
         return level;
     }
 

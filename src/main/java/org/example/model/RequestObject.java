@@ -1,24 +1,32 @@
 package org.example.model;
 
 public class RequestObject {
-    private final String requesterName;
-    private final String date;
+
     private final String bookName;
     private final String bookGenre;
+    private final String requesterEmail;
+    private final int priority;
+    private int arrivalCounter;
 
-    public RequestObject(String requesterName, String date, String bookName, String bookGenre) {
-        this.requesterName = requesterName;
-        this.date = date;
+    public RequestObject(String bookName, String bookGenre, String requesterEmail, int priority,int arrivalCounter) {
         this.bookName = bookName;
         this.bookGenre = bookGenre;
+        this.requesterEmail = requesterEmail;
+        this.priority = priority;
+        this.arrivalCounter = arrivalCounter;
+
     }
 
-    public String getRequesterName() {
-        return requesterName;
+    public int getArrivalCounter() {
+        return arrivalCounter;
     }
 
-    public String getDate() {
-        return date;
+    public String getRequesterEmail() {
+        return requesterEmail;
+    }
+
+    public int getPriority() {
+        return priority;
     }
 
     public String getBookName() {

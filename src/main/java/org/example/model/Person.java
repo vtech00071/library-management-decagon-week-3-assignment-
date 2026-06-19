@@ -11,15 +11,22 @@ abstract public class Person implements CreateAccountServices {
     protected String password;
     protected String title;
     protected int libraryId;
+    protected String identity;
 
-    public Person(String firstname, String lastname, String email, String password, String title, int libraryId) {
+    public Person(String firstname, String lastname, String email, String password, String title, int libraryId,String identity) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.email = email;
         this.password = password;
         this.title = title;
         this.libraryId = libraryId;
+        this.identity = identity;
     }
+
+    public String getIdentity() {
+        return identity;
+    }
+
     public String getFirstname() {
         return firstname;
     }
