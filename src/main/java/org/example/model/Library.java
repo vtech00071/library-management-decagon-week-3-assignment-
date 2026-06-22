@@ -12,15 +12,14 @@ public class Library implements LoginServices, CreateAccountServices {
     private final Map<String, Teachers> teacher;
     private final Map<String, ShelvesByGenre> shelves;
     static int arrivalCounter = 0;
-    private final PriorityQueue<RequestObject> requestBook = new PriorityQueue<>(
-            (a, b) -> {
-                if (a.getPriority() != b.getPriority()) {
-                    return a.getPriority() - b.getPriority();
-                } else {
-                    return a.getArrivalCounter() - b.getArrivalCounter();
-                }
-            }
-    );
+    private final Queue<RequestObject> requestBook = new PriorityQueue<>((a, b) -> {
+        if (a.getPriority() != b.getPriority()) {
+            return a.getPriority() - b.getPriority();
+        } else {
+            return a.getArrivalCounter() - b.getArrivalCounter();
+
+        }
+    });
 
 
     //this is a constructor
@@ -57,7 +56,7 @@ public class Library implements LoginServices, CreateAccountServices {
     //this will allow will allow us to get the this queue and use it in the main function
 
 
-    public PriorityQueue<RequestObject> getRequestBook() {
+    public Queue<RequestObject> getRequestBook() {
         return requestBook;
     }
 
@@ -100,20 +99,16 @@ public class Library implements LoginServices, CreateAccountServices {
         //enhanced switch
         arrivalCounter += 1;
         if (studentOrTeacher.equals("teacher")) {
-            String teacherFullName = (this.teacher.get(requesterEmail).firstname + " " + this.teacher.get(requesterEmail).lastname);
+            String teacherFullName = (this.teacher.get(requesterEmail).getFirstname() + " " + this.teacher.get(requesterEmail).getLastname());
             requestBook.offer(new RequestObject(bookName, bookGenre, teacherFullName, 1, arrivalCounter));
         } else if (studentOrTeacher.equals("student")) {
             String studentFullName = (this.students.get(requesterEmail).firstname + " " + this.students.get(requesterEmail).lastname);
 
             switch (this.students.get(requesterEmail).getLevel()) {
-                case 400 ->
-                        requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 2, arrivalCounter));
-                case 300 ->
-                        requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 3, arrivalCounter));
-                case 200 ->
-                        requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 4, arrivalCounter));
-                case 100 ->
-                        requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 5, arrivalCounter));
+                case 400 -> requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 2, arrivalCounter));
+                case 300 -> requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 3, arrivalCounter));
+                case 200 -> requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 4, arrivalCounter));
+                case 100 -> requestBook.offer(new RequestObject(bookName, bookGenre, studentFullName, 5, arrivalCounter));
                 default -> System.out.println("this does not exist");
             }
         } else {
@@ -121,21 +116,23 @@ public class Library implements LoginServices, CreateAccountServices {
         }
     }
 
-
     //this is the method that we will use to serve the book
-
-    public void serveBook(String bookName, String bookGenre) {
-        //while this loop is running
-        //it will run in the number of time the book is inside
+    public void serveBook() {
+        boolean servedBooks = false;
         while (!this.requestBook.isEmpty()) {
             RequestObject theBooks = this.requestBook.poll();
-            for (Book books : this.shelves.get(bookGenre).getBooks()) {
+            for (Book books : this.shelves.get(theBooks.getBookGenre()).getBooks()) {
                 //all the book will set their borrowed to true
-                if (books.getBookName().equals(bookName)) {
+                if (books.getBookName().equals(theBooks.getBookName())) {
+                    servedBooks = true;
                     books.setBorrowed(true);
+                    String bookNames = theBooks.getBookName();
+                    System.out.println(bookNames + " has been served successfully ");
                 }
             }
-
+        }
+        if (!servedBooks) {
+            System.out.println("this book was not served successfully");
         }
     }
 
@@ -158,6 +155,24 @@ public class Library implements LoginServices, CreateAccountServices {
         }
     }
 
+    //this method is for libararian login
+    public boolean loginLibrarian(String email, String password) {
+        boolean userExist = this.librarians.containsKey(email);
+        try {
+            if (!userExist) {
+                System.out.println("USER NOT FOUND !!!");
+                return false;
+            }
+            //this either return true of false
+            //this is directly to the student so its not to list that is why  i did it like this
+            return this.librarians.get(email).getPassword().equals(password);
+            // we have this null pointer because what i if the email which is the key is null
+        } catch (NullPointerException e) {
+            System.out.println(Arrays.toString(e.getStackTrace()));
+            return false;
+        }
+
+    }
 
     //this method will work for the teachers login
     @Override
