@@ -9,8 +9,4 @@ public class Librarian extends Person {
         super(firstname, lastname, email, password, title, libraryId, identity);
     }
 
-    @Override
-    public boolean createAccount(Map<String, String> userFields) {
-        return false;
-    }
 }

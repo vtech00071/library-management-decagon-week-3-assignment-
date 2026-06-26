@@ -9,6 +9,7 @@ import java.util.Scanner;
 public class Main {
     // i will remove the library but i will think about what to do with it later
     static Scanner scanner = new Scanner(System.in);
+    static int arrivalCounter = 0;
 
     static void main() {
         Library library = new Library();
@@ -71,7 +72,7 @@ public class Main {
         scanner.close();
     }
 
-    public static void mainMenu(Library library) {
+    private static void mainMenu(Library library) {
 
         System.out.println("=================================================");
         System.out.println("       DECAGON  LIBRARY MANAGEMENT SYSTEM");
@@ -84,139 +85,15 @@ public class Main {
         String option = scanner.nextLine().strip().toLowerCase();
 
         switch (option) {
-            case "1" -> createAccountMenu(library);
+            case "1" -> createAccount(library);
             case "2" -> loginMenu(library);
             default -> System.out.println("thanks for coming you are free to visit another time");
         }
     }
 
-    public static void loginMenu(Library library) {
-        System.out.println("=================================================");
-        System.out.println("               LOGIN                            |");
-        System.out.println("=================================================");
-        System.out.println("1. Student                                      |");
-        System.out.println("2. Teacher                                      |");
-        System.out.println("3. Librarian                                    |");
-        System.out.println("4. Back                                         |");
-        System.out.println("=================================================");
-        System.out.print("Enter Option: ");
-        String option = scanner.nextLine().strip().toLowerCase();
-        switch (option) {
-            case "1" -> studentLogin(library);
-            case "2" -> teacherLogin(library);
-            case "3" -> librarianLogin(library);
-            default -> System.out.println("invalid option");
-        }
-    }
-
-    //this method is where the librarian will login and serve the book
-    public static void librarianLogin(Library library) {
-        System.out.print("EMAIL: ");
-        String email = scanner.nextLine().strip().toLowerCase();
-        System.out.print("PASSWORD: ");
-        String password = scanner.nextLine().strip().toLowerCase();
-        if (library.loginLibrarian(email, password)) {
-            String user = (library.getLibrarians().get(email).getFirstname() + " " + library.getLibrarians().get(email).getLastname());
-            System.out.println(" WELCOME: " + library.getLibrarians().get(email).getTitle() + " " + user);
-
-            System.out.print("do you want to serve the book now yes/no? : ");
-            String question = scanner.nextLine().strip().toLowerCase();
-            if (question.equals("yes")) {
-                library.serveBook();
-            } else {
-                System.out.println("operation has been cancelled");
-            }
-        } else {
-            System.out.println("invalid email or password please try again");
-        }
-
-    }
-
-    //teacher and student should use the same login how do i go about it
-    private static void teacherLogin(Library library) {
-        System.out.print("EMAIL: ");
-        String email = scanner.nextLine().strip().toLowerCase();
-        System.out.print("PASSWORD: ");
-        String password = scanner.nextLine().strip().toLowerCase();
-        if (library.loginTeachersAccount(email, password)) {
-            String user = (library.getTeacher().get(email).getFirstname() + " " + library.getTeacher().get(email).getLastname());
-            System.out.println(" WELCOME: " + library.getTeacher().get(email).getTitle() + " " + user);
-
-            System.out.println("=================================================");
-            System.out.println("               DO YOU WANT TO REQUEST FOR A BOOK ");
-            System.out.println("=================================================");
-            System.out.println("1. yes");
-            System.out.println("2. exit");
-            System.out.print("Enter Option: ");
-            String option = scanner.nextLine().strip().toLowerCase();
-
-            if (option.equals("1")) {
-                System.out.print("EMAIL: ");
-                String requesterEmail = scanner.nextLine().strip().toLowerCase();
-                System.out.print("BOOK-NAME: ");
-                String bookName = scanner.nextLine();
-                System.out.print("BOOK-GENRE: ");
-                String bookGenre = scanner.nextLine();
-                System.out.print("are you a student or a teacher? : ");
-                String studentOrTeacher = scanner.nextLine();
-                //i am also going to create a file and add all the history of borrowed book
-                library.requestBook(requesterEmail, bookName, bookGenre, studentOrTeacher);
-            }
-        }
-    }
-
-    //this is the login method
-    public static void studentLogin(Library library) {
-        System.out.print("EMAIL: ");
-        String email = scanner.nextLine().strip().toLowerCase();
-        System.out.print("PASSWORD: ");
-        String password = scanner.nextLine().strip().toLowerCase();
-        if (library.loginAccount(email, password)) {
-            String user = (library.getStudents().get(email).getFirstname() + " " + library.getStudents().get(email).getLastname());
-            System.out.println(" WELCOME: " + library.getStudents().get(email).getTitle() + " " + user);
-
-            System.out.println("=================================================");
-            System.out.println("               DO YOU WANT TO REQUEST FOR A BOOK ");
-            System.out.println("=================================================");
-            System.out.println("1. yes");
-            System.out.println("2. exit");
-            System.out.print("Enter Option: ");
-            String option = scanner.nextLine().strip().toLowerCase();
-
-            if (option.equals("1")) {
-                System.out.print("EMAIL: ");
-                String requesterEmail = scanner.nextLine().strip().toLowerCase();
-                System.out.print("BOOK-NAME: ");
-                String bookName = scanner.nextLine();
-                System.out.print("BOOK-GENRE: ");
-                String bookGenre = scanner.nextLine();
-                System.out.print("are you a student or a teacher? : ");
-                String studentOrTeacher = scanner.nextLine();
-                //i am also going to create a file and add all the history of borrowed book
-                library.requestBook(requesterEmail, bookName, bookGenre, studentOrTeacher);
-            }
-        }
-    }
-
-    //this method is to create account
-    public static void createAccountMenu(Library library) {
-        System.out.println("=================================================");
-        System.out.println("               CREATE ACCOUNT");
-        System.out.println("=================================================");
-        System.out.println("1. yes");
-        System.out.println("2. exit");
-        System.out.println("=================================================");
-        System.out.print("Enter Option: ");
-        String option = scanner.nextLine().strip().toLowerCase();
-        if (option.equals("1")) {
-            createAccount(library);
-        } else {
-            System.out.println("thanks for coming you are free to visit another time");
-        }
-    }
-
     //this method is for the student account creation and teacher account creation
-    public static void createAccount(Library library) {
+    //this method is performing too much operation i will still simplify it
+    private static void createAccount(Library library) {
         Map<String, String> userFields = new HashMap<>();
         // this will take in all the user fields or properties
         System.out.print("FIRSTNAME: ");
@@ -233,10 +110,8 @@ public class Main {
         String title = scanner.nextLine().strip().toLowerCase();
         System.out.print("write student or teacher? : ");
         String identity = scanner.nextLine().strip().toLowerCase();
-        System.out.print("level: ");
-        int level = scanner.nextInt();
-        scanner.nextLine();
-
+        System.out.print("level: ignore if you are not a student: ");
+        String level = scanner.nextLine().strip().toLowerCase();
         //then here we are going to load all those user fields into an hashmap
 
         userFields.put("firstname", firstname);
@@ -245,34 +120,148 @@ public class Main {
         userFields.put("password", password);
         userFields.put("confirmPassword", confirmPassword);
         userFields.put("title", title);
-
-        if (library.createAccount(userFields)) {
-            int libraryId = ((int) (Math.random() * 500000));
-            //i will still do separations of concern different logic for student account creation
-            // and different logic for teachers account creation
-            if (identity.equals("student")) {
-                Students student = new Students(firstname, lastname, email, password, title, libraryId, identity);
-                student.setLevel(level);
-                library.getStudents().put(email, student);
-                System.out.println("student have been added succesfully");
-                System.out.println("LIBRARY-ID: " + libraryId);
-                System.out.println("LIST OF STUDENTS IN THE LIBRARY");
-                //this will display the list of all the student in the library
-                for (Students libraryStudentNames : library.getStudents().values()) {
-                    System.out.println(libraryStudentNames.getFirstname() + " " + libraryStudentNames.getLastname());
-                    System.out.println(libraryStudentNames.getPassword());
+        int libraryId = ((int) (Math.random() * 500000));
+        switch (library.createAccount(userFields)){
+            case EMPTY_FIELDS -> System.out.println("some fields are empty please try again");
+            case INVALID_EMAIL -> System.out.println("invalid email please try again");
+            case PASSWORDS_DOES_NOT_MATCH -> System.out.println("password and confirm password not match");
+            case INVALID_TITLE -> System.out.println("invalid title e.g mr,mrs....");
+            case ACCOUNT_CREATION_SUCCESSFUL -> {
+                System.out.println("account creation successful");
+                if (identity.equals("student")) {
+                   if (!level.isBlank()){
+                       Person student = new Students(firstname, lastname, email, password, title, libraryId, identity);
+                       student.setLevel(level);
+                       library.getLibraryUsers().put(email, student);
+                       System.out.println("User have been added!");
+                   }else {
+                       System.out.println("you are a student your level section cannot be blank");
+                   }
+                } else {
+                    library.getLibraryUsers().put(email, new Teachers(firstname, lastname, email, password, title, libraryId, identity));
+                    System.out.println("User have been added!");
                 }
-            } else if (identity.equals("teacher")) {
-                library.getTeacher().put(email, new Teachers(firstname, lastname, email, password, title, libraryId, identity));
-                System.out.println("teachers have been added succesfully");
-                System.out.println("LIBRARY-ID: " + libraryId);
-                System.out.println("LIST OF TEACHERS IN THE LIBRARY");
-                //this will print the list of all the teachers in the library
-                for (Teachers libraryTeacherNames : library.getTeacher().values()) {
-                    System.out.println(libraryTeacherNames.getFirstname() + " " + libraryTeacherNames.getLastname());
+                System.out.println("LIST OF ALL THE LIBRARY USERS ");
+                //this loop will generate all the names of the library users
+                for (Person libraryUsers : library.getLibraryUsers().values()) {
+                    //i want the level of the student to display
+                    String userNames = (libraryUsers.getFirstname() + " " + libraryUsers.getLastname());
+                    System.out.println("NAME: " + userNames + " IDENTITY:  " + libraryUsers.getIdentity());
                 }
-
             }
+        }
+    }
+
+
+
+    private static void loginMenu(Library library) {
+        System.out.println("=================================================");
+        System.out.println("                  LOGIN                          ");
+        System.out.println("=================================================");
+        System.out.println("1. User");
+        System.out.println("2. Librarian");
+        System.out.println("=================================================");
+        System.out.print("Enter Option: ");
+        String option = scanner.nextLine().strip().toLowerCase();
+        switch (option) {
+            case "1" -> Login(library);
+            case "2" -> librarianLogin(library);
+            default -> System.out.println("invalid option");
+        }
+    }
+
+    //this method is where the librarian will login and serve the book
+    private static void librarianLogin(Library library) {
+        System.out.print("EMAIL: ");
+        String email = scanner.nextLine().strip().toLowerCase();
+        System.out.print("PASSWORD: ");
+        String password = scanner.nextLine().strip().toLowerCase();
+        switch (library.loginLibrarian(email, password)) {
+            case USER_DOES_NOT_EXIST -> System.out.println("user does not exist or invalid email");
+            case INVALID_PASSWORD -> System.out.println("invalid password please try again");
+            case LOGIN_SUCCESSFUL -> librarianServeBookDashboard(library, email);
+        }
+    }
+
+    //this method will prompt the librarian to serve the book
+    private static void librarianServeBookDashboard(Library library, String email) {
+        String user = (library.getLibrarians().get(email).getFirstname() + " " + library.getLibrarians().get(email).getLastname());
+        System.out.println(" WELCOME: " + library.getLibrarians().get(email).getTitle() + " " + user);
+        System.out.print("do you want to serve the book now yes/no? : ");
+        String question = scanner.nextLine().strip().toLowerCase();
+        if (question.equals("yes")) {
+            library.serveBook();
+        } else {
+            System.out.println("operation has been cancelled");
+        }
+    }
+
+    //teacher and student should use the same login how do i go about it
+    private static void Login(Library library) {
+        System.out.print("EMAIL: ");
+        String email = scanner.nextLine().strip().toLowerCase();
+        System.out.print("PASSWORD: ");
+        String password = scanner.nextLine().strip().toLowerCase();
+        switch (library.loginAccount(email, password)) {
+            case USER_DOES_NOT_EXIST -> System.out.println("user does not exist or invalid email");
+            case INVALID_PASSWORD -> System.out.println("invalid password please try again");
+            case LOGIN_SUCCESSFUL -> requestBookDashboard(library, email);
+        }
+    }
+
+    //this dashboard is `to request for a book
+    private static void requestBookDashboard(Library library, String email) {
+        String user = (library.getLibraryUsers().get(email).getFirstname() + " " + library.getLibraryUsers().get(email).getLastname());
+        System.out.println(" WELCOME: " + library.getLibraryUsers().get(email).getTitle() + " " + user);
+
+        System.out.println("do you want to request for a book? yes/no: ");
+        System.out.print("Enter Option: ");
+        String option = scanner.nextLine().strip().toLowerCase();
+        if (option.equals("yes")) {
+            bookRequestMenu(library);
+        } else {
+            System.out.println("thanks for visiting come next time");
+        }
+    }
+
+    private static void bookRequestMenu(Library library) {
+        System.out.print("EMAIL: ");
+        String requesterEmail = scanner.nextLine().strip().toLowerCase();
+        System.out.print("BOOK-NAME: ");
+        String bookName = scanner.nextLine();
+        System.out.print("BOOK-GENRE: ");
+        String bookGenre = scanner.nextLine();
+        //i am also going to create a file and add all the history of borrowed book
+        switch (library.requestBook(bookName, bookGenre)) {
+            case GENRE_NOT_FOUND -> System.out.println("this genre that you have looking for does not exist");
+            case BOOK_HAS_BEEN_BORROWED -> System.out.println("this book has been borrowed");
+            case BOOK_DOES_NOT_EXIST -> System.out.println("this book does not exist");
+            case BOOK_REQUESTED_SUCCESSFULLY -> {
+                System.out.println("this book has been requested successfully ");
+                //this method will add the books inside the queue
+                addRequestBook(requesterEmail, bookName, bookGenre, library);
+            }
+        }
+    }
+
+    private static void addRequestBook(String requesterEmail, String bookName, String bookGenre, Library library) {
+        //enhanced switch
+        String usersName = (library.getLibraryUsers().get(requesterEmail).getFirstname() + " " + library.getLibraryUsers().get(requesterEmail).getFirstname());
+        arrivalCounter += 1;
+        if (library.getLibraryUsers().get(requesterEmail).getIdentity().equals("teacher")) {
+
+            library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 1, arrivalCounter));
+        } else if (library.getLibraryUsers().get(requesterEmail).getIdentity().equals("student")) {
+
+            switch (library.getLibraryUsers().get(requesterEmail).getLevel()) {
+                case "400" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 2, arrivalCounter));
+                case "300" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 3, arrivalCounter));
+                case "200" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 4, arrivalCounter));
+                case "100" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 5, arrivalCounter));
+                default -> System.out.println("this does not exist");
+            }
+        } else {
+            System.out.println("error please try again");
         }
     }
 }

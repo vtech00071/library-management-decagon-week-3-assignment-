@@ -1,6 +1,7 @@
 package org.example.util;
 
+import org.example.enums.LoginMessage;
+
 public interface LoginServices {
-    public boolean loginAccount(String email,String password);
-    public boolean  loginTeachersAccount(String email,String password);
+    public LoginMessage loginAccount(String email, String password);
 }

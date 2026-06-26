@@ -1,5 +1,6 @@
 package org.example.model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -7,9 +8,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class LibraryTest {
 
     Library library = new Library();
+    @BeforeEach
+
 
     @Test
     void thisshouldreturnfalseifthebookdoesnotexist() {
+
 
         //arrange
         String requesterEmail = "victorfemi@gmail.com";
@@ -18,11 +22,6 @@ class LibraryTest {
         String studentOrTeacher = "student";
 
         //act
-       library.requestBook(requesterEmail,bookName,bookGenre,studentOrTeacher);
-        assertNull();
-
-
-
 
 
     }

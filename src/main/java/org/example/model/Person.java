@@ -4,7 +4,7 @@ import org.example.util.CreateAccountServices;
 import org.example.util.LoginServices;
 
 //this is an abstract class because I don't want to instantiate it
-abstract public class Person implements CreateAccountServices {
+abstract public class Person {
     protected String firstname;
     protected String lastname;
     protected String email;
@@ -12,6 +12,7 @@ abstract public class Person implements CreateAccountServices {
     protected String title;
     protected int libraryId;
     protected String identity;
+    protected String  level;
 
     public Person(String firstname, String lastname, String email, String password, String title, int libraryId,String identity) {
         this.firstname = firstname;
@@ -21,6 +22,14 @@ abstract public class Person implements CreateAccountServices {
         this.title = title;
         this.libraryId = libraryId;
         this.identity = identity;
+    }
+
+    public String  getLevel() {
+        return level;
+    }
+
+    public void setLevel(String  level) {
+        this.level = level;
     }
 
     public String getIdentity() {
