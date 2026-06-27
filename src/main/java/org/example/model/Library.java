@@ -9,10 +9,13 @@ import org.example.util.LoginServices;
 import java.util.*;
 
 import static java.util.Arrays.stream;
+import static org.example.enums.AccountCreationMessage.*;
+import static org.example.enums.LoginMessage.*;
+import static org.example.enums.RequestBookOutcome.*;
 
 public class Library implements LoginServices, CreateAccountServices {
     private final Map<String, Librarian> librarians;
-    private final Map<String, Person> LibraryUsers;
+    private final Map<String, Person> libraryUsers;
     private final Map<String, ShelvesByGenre> shelves;
     static int arrivalCounter = 0;
     //this is getting the books out of the queue
@@ -21,6 +24,7 @@ public class Library implements LoginServices, CreateAccountServices {
     private final Queue<RequestObject> requestBook = new PriorityQueue<>((a, b) -> {
         if (a.getPriority() != b.getPriority()) {
             return a.getPriority() - b.getPriority();
+
         }
         return a.getArrivalCounter() - b.getPriority();
     });
@@ -29,7 +33,7 @@ public class Library implements LoginServices, CreateAccountServices {
     public Library() {
         this.librarians = new HashMap<>();
         this.shelves = new HashMap<>();
-        this.LibraryUsers = new HashMap<>();
+        this.libraryUsers = new HashMap<>();
     }
 
     public Map<String, Librarian> getLibrarians() {
@@ -37,7 +41,7 @@ public class Library implements LoginServices, CreateAccountServices {
     }
 
     public Map<String, Person> getLibraryUsers() {
-        return LibraryUsers;
+        return libraryUsers;
     }
 
     public Map<String, ShelvesByGenre> getShelves() {
@@ -55,18 +59,18 @@ public class Library implements LoginServices, CreateAccountServices {
     //this method will check if the book that is requested exists
     public RequestBookOutcome requestBook(String bookName, String bookGenre) {
         if (!this.shelves.containsKey(bookGenre)) {
-            return RequestBookOutcome.GENRE_NOT_FOUND;
+            return GENRE_NOT_FOUND;
         }
         for (Book theBookName : this.shelves.get(bookGenre).getBooks()) {
             if (theBookName.getBookName().equals(bookName)) {
                 if (theBookName.getIsBorrowed()) {
-                    return RequestBookOutcome.BOOK_HAS_BEEN_BORROWED;
+                    return BOOK_HAS_BEEN_BORROWED;
                 } else {
-                    return RequestBookOutcome.BOOK_REQUESTED_SUCCESSFULLY;
+                    return BOOK_REQUESTED_SUCCESSFULLY;
                 }
             }
         }
-        return RequestBookOutcome.BOOK_DOES_NOT_EXIST;
+        return BOOK_DOES_NOT_EXIST;
     }
 
 
@@ -75,17 +79,17 @@ public class Library implements LoginServices, CreateAccountServices {
         boolean servedBooks = false;
         while (!this.requestBook.isEmpty()) {
             //this means the books based on their priority
-            RequestObject theBooks = this.requestBook.poll();
-            for (Book books : this.shelves.get(theBooks.getBookGenre()).getBooks()) {
+            RequestObject theBook = this.requestBook.poll();
+            for (Book book : this.shelves.get(theBook.getBookGenre()).getBooks()) {
                 //all the book will set their borrowed to true
-                if (books.getBookName().equals(theBooks.getBookName())) {
+                if (book.getBookName().equals(theBook.getBookName())) {
                     servedBooks = true;
-                    books.setBorrowed(true);
-                    String bookNames = theBooks.getBookName();
-                    String requesterUsername = (this.LibraryUsers.get(theBooks.getRequesterEmail()).firstname + " " + this.LibraryUsers.get(theBooks.getRequesterEmail()).lastname);
-                    String requesterIdentity = this.LibraryUsers.get(theBooks.getRequesterEmail()).identity;
+                    book.setBorrowed(true);
+                    String bookNames = theBook.getBookName();
+                    String requesterUsername = (this.libraryUsers.get(theBook.getRequesterEmail()).getFirstname() + " " + this.libraryUsers.get(theBook.getRequesterEmail()).lastname);
+                    String requesterIdentity = this.libraryUsers.get(theBook.getRequesterEmail()).identity;
                     if (requesterIdentity.equals("student")) {
-                        String requesterLevel = this.LibraryUsers.get(theBooks.getRequesterEmail()).level;
+                        String requesterLevel = this.libraryUsers.get(theBook.getRequesterEmail()).level;
                         System.out.println(bookNames + " has been served successfully to NAME:  " + requesterUsername + " IDENTITY: " + requesterIdentity + " LEVEL: " + requesterLevel);
                     } else {
                         System.out.println(bookNames + " has been served successfully to NAME:  " + requesterUsername + " IDENTITY: " + requesterIdentity);
@@ -101,25 +105,25 @@ public class Library implements LoginServices, CreateAccountServices {
     //this is the method for login students
     @Override
     public LoginMessage loginAccount(String email, String password) {
-        if (!this.LibraryUsers.containsKey(email)) {
-            return LoginMessage.USER_DOES_NOT_EXIST;
+        if (!this.libraryUsers.containsKey(email)) {
+            return USER_DOES_NOT_EXIST;
         }
-        if (!this.LibraryUsers.get(email).getPassword().equals(password)) {
-            return LoginMessage.INVALID_PASSWORD;
+        if (!this.libraryUsers.get(email).getPassword().equals(password)) {
+            return INVALID_PASSWORD;
         }
-        return LoginMessage.LOGIN_SUCCESSFUL;
+        return LOGIN_SUCCESSFUL;
 
     }
 
     //this method is for librarian login
     public LoginMessage loginLibrarian(String email, String password) {
         if (!this.librarians.containsKey(email)) {
-            return LoginMessage.USER_DOES_NOT_EXIST;
+            return USER_DOES_NOT_EXIST;
         }
         if (!this.librarians.get(email).getPassword().equals(password)) {
-            return LoginMessage.INVALID_PASSWORD;
+            return INVALID_PASSWORD;
         }
-        return LoginMessage.LOGIN_SUCCESSFUL;
+        return LOGIN_SUCCESSFUL;
     }
 
 
@@ -130,22 +134,22 @@ public class Library implements LoginServices, CreateAccountServices {
         String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
         for (String values : userFields.values()) {
             if (values == null) {
-                return AccountCreationMessage.EMPTY_FIELDS;
+                return EMPTY_FIELDS;
             }
         }
         //check if the email is a valid email
         if (!userFields.get("email").matches(regex)) {
-            return AccountCreationMessage.INVALID_EMAIL;
+            return INVALID_EMAIL;
         }
         //check if the password and the confirmation password is the same
         if (!userFields.get("password").equals(userFields.get("confirmPassword"))) {
-            return AccountCreationMessage.PASSWORDS_DOES_NOT_MATCH;
+            return PASSWORDS_DOES_NOT_MATCH;
         }
         //check if the title is a valid title
         if (!correctTitles.contains(userFields.get("title"))) {
-            return AccountCreationMessage.INVALID_TITLE;
+            return INVALID_TITLE;
         }
-        return AccountCreationMessage.ACCOUNT_CREATION_SUCCESSFUL;
+        return ACCOUNT_CREATION_SUCCESSFUL;
     }
 
 }

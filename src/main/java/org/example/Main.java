@@ -246,18 +246,17 @@ public class Main {
 
     private static void addRequestBook(String requesterEmail, String bookName, String bookGenre, Library library) {
         //enhanced switch
-        String usersName = (library.getLibraryUsers().get(requesterEmail).getFirstname() + " " + library.getLibraryUsers().get(requesterEmail).getFirstname());
+//        String usersName = (library.getLibraryUsers().get(requesterEmail).getFirstname() + " " + library.getLibraryUsers().get(requesterEmail).getLastname());
         arrivalCounter += 1;
         if (library.getLibraryUsers().get(requesterEmail).getIdentity().equals("teacher")) {
-
-            library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 1, arrivalCounter));
+            library.getRequestBook().offer(new RequestObject(bookName, bookGenre,requesterEmail , 1, arrivalCounter));
         } else if (library.getLibraryUsers().get(requesterEmail).getIdentity().equals("student")) {
 
             switch (library.getLibraryUsers().get(requesterEmail).getLevel()) {
-                case "400" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 2, arrivalCounter));
-                case "300" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 3, arrivalCounter));
-                case "200" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 4, arrivalCounter));
-                case "100" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, usersName, 5, arrivalCounter));
+                case "400" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 2, arrivalCounter));
+                case "300" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre,requesterEmail , 3, arrivalCounter));
+                case "200" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre,requesterEmail , 4, arrivalCounter));
+                case "100" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre,requesterEmail , 5, arrivalCounter));
                 default -> System.out.println("this does not exist");
             }
         } else {
