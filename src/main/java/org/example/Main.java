@@ -11,7 +11,7 @@ public class Main {
     static Scanner scanner = new Scanner(System.in);
     static int arrivalCounter = 0;
 
-    static void main() {
+    public static void main(String[] args) {
         Library library = new Library();
         //we have a map that takes string as key and shelves by genre as values
         //in this shelves we have list books
@@ -121,7 +121,7 @@ public class Main {
         userFields.put("confirmPassword", confirmPassword);
         userFields.put("title", title);
         int libraryId = ((int) (Math.random() * 500000));
-        switch (library.createAccount(userFields)){
+        switch (library.createAccount(userFields)) {
             case EMPTY_FIELDS -> System.out.println("some fields are empty please try again");
             case INVALID_EMAIL -> System.out.println("invalid email please try again");
             case PASSWORDS_DOES_NOT_MATCH -> System.out.println("password and confirm password not match");
@@ -129,29 +129,25 @@ public class Main {
             case ACCOUNT_CREATION_SUCCESSFUL -> {
                 System.out.println("account creation successful");
                 if (identity.equals("student")) {
-                   if (!level.isBlank()){
-                       Person student = new Students(firstname, lastname, email, password, title, libraryId, identity);
-                       student.setLevel(level);
-                       library.getLibraryUsers().put(email, student);
-                       System.out.println("User have been added!");
-                   }else {
-                       System.out.println("you are a student your level section cannot be blank");
-                   }
+                    if (!level.isBlank()) {
+                        Person student = new Students(firstname, lastname, email, password, title, libraryId, identity);
+                        student.setLevel(level);
+                        library.getLibraryUsers().put(email, student);
+                        System.out.println("User have been added!");
+                    } else {
+                        System.out.println("you are a student your level section cannot be blank");
+                    }
                 } else {
                     library.getLibraryUsers().put(email, new Teachers(firstname, lastname, email, password, title, libraryId, identity));
                     System.out.println("User have been added!");
                 }
+                //we used this lambda expression and stream api to print all the users in the library
                 System.out.println("LIST OF ALL THE LIBRARY USERS ");
-                //this loop will generate all the names of the library users
-                for (Person libraryUsers : library.getLibraryUsers().values()) {
-                    //i want the level of the student to display
-                    String userNames = (libraryUsers.getFirstname() + " " + libraryUsers.getLastname());
-                    System.out.println("NAME: " + userNames + " IDENTITY:  " + libraryUsers.getIdentity());
-                }
+                library.getLibraryUsers().values().stream().map(user -> "NAME: " + user.getFirstname() + " " + user.getLastname() + " IDENTITY: " + user.getIdentity()).forEach(System.out::println);
             }
+
         }
     }
-
 
 
     private static void loginMenu(Library library) {
@@ -249,14 +245,18 @@ public class Main {
 //        String usersName = (library.getLibraryUsers().get(requesterEmail).getFirstname() + " " + library.getLibraryUsers().get(requesterEmail).getLastname());
         arrivalCounter += 1;
         if (library.getLibraryUsers().get(requesterEmail).getIdentity().equals("teacher")) {
-            library.getRequestBook().offer(new RequestObject(bookName, bookGenre,requesterEmail , 1, arrivalCounter));
+            library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 1, arrivalCounter));
         } else if (library.getLibraryUsers().get(requesterEmail).getIdentity().equals("student")) {
 
             switch (library.getLibraryUsers().get(requesterEmail).getLevel()) {
-                case "400" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 2, arrivalCounter));
-                case "300" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre,requesterEmail , 3, arrivalCounter));
-                case "200" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre,requesterEmail , 4, arrivalCounter));
-                case "100" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre,requesterEmail , 5, arrivalCounter));
+                case "400" ->
+                        library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 2, arrivalCounter));
+                case "300" ->
+                        library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 3, arrivalCounter));
+                case "200" ->
+                        library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 4, arrivalCounter));
+                case "100" ->
+                        library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 5, arrivalCounter));
                 default -> System.out.println("this does not exist");
             }
         } else {

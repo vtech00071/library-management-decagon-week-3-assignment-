@@ -7,6 +7,8 @@ import org.example.util.CreateAccountServices;
 import org.example.util.LoginServices;
 
 import java.util.*;
+//import java.util.
+import java.util.function.Predicate;
 
 import static java.util.Arrays.stream;
 import static org.example.enums.AccountCreationMessage.*;
@@ -18,15 +20,14 @@ public class Library implements LoginServices, CreateAccountServices {
     private final Map<String, Person> libraryUsers;
     private final Map<String, ShelvesByGenre> shelves;
     static int arrivalCounter = 0;
-    //this is getting the books out of the queue
-    //we will remove the book use the genre and bookname to find the books in the shelves
-    //and set the borrow book to true
+
+    // this is a priority queue and we are using lambda expressions
     private final Queue<RequestObject> requestBook = new PriorityQueue<>((a, b) -> {
         if (a.getPriority() != b.getPriority()) {
-            return a.getPriority() - b.getPriority();
-
+            return Integer.compare(a.getPriority(), b.getPriority());
         }
-        return a.getArrivalCounter() - b.getPriority();
+        //here we using arrival counter intead and that is when
+        return Integer.compare(a.getArrivalCounter(), b.getArrivalCounter());
     });
 
 
@@ -58,7 +59,8 @@ public class Library implements LoginServices, CreateAccountServices {
 
     //this method will check if the book that is requested exists
     public RequestBookOutcome requestBook(String bookName, String bookGenre) {
-        if (!this.shelves.containsKey(bookGenre)) {
+        ShelvesByGenre targetShelf = this.shelves.get(bookGenre);
+        if (targetShelf == null) {
             return GENRE_NOT_FOUND;
         }
         for (Book theBookName : this.shelves.get(bookGenre).getBooks()) {
@@ -75,15 +77,16 @@ public class Library implements LoginServices, CreateAccountServices {
 
 
     //this is the method that we will use to serve the book
+    //
     public void serveBook() {
-        boolean servedBooks = false;
         while (!this.requestBook.isEmpty()) {
             //this means the books based on their priority
+            //i cant use declarative approach for this because it contains business logics and so many condition and also
+            //change of state of some properties so it will be a bad idea for me to use declarative approach for this
             RequestObject theBook = this.requestBook.poll();
             for (Book book : this.shelves.get(theBook.getBookGenre()).getBooks()) {
                 //all the book will set their borrowed to true
                 if (book.getBookName().equals(theBook.getBookName())) {
-                    servedBooks = true;
                     book.setBorrowed(true);
                     String bookNames = theBook.getBookName();
                     String requesterUsername = (this.libraryUsers.get(theBook.getRequesterEmail()).getFirstname() + " " + this.libraryUsers.get(theBook.getRequesterEmail()).lastname);
@@ -97,9 +100,7 @@ public class Library implements LoginServices, CreateAccountServices {
                 }
             }
         }
-        if (!servedBooks) {
-            System.out.println("this book was not served successfully");
-        }
+        System.out.println("this book was not served successfully");
     }
 
     //this is the method for login students
@@ -112,7 +113,6 @@ public class Library implements LoginServices, CreateAccountServices {
             return INVALID_PASSWORD;
         }
         return LOGIN_SUCCESSFUL;
-
     }
 
     //this method is for librarian login
@@ -132,10 +132,9 @@ public class Library implements LoginServices, CreateAccountServices {
     public AccountCreationMessage createAccount(Map<String, String> userFields) {
         List<String> correctTitles = new ArrayList<>(Arrays.asList("mr", "mrs", "prof", "dr"));
         String regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-        for (String values : userFields.values()) {
-            if (values == null) {
-                return EMPTY_FIELDS;
-            }
+        //this will go through all the value and check if any value is empty
+        if (userFields.containsValue(null)) {
+            return EMPTY_FIELDS;
         }
         //check if the email is a valid email
         if (!userFields.get("email").matches(regex)) {
