@@ -1,5 +1,8 @@
 package org.example;
 
+import org.example.exceptions.GenreNotFoundRuntimeException;
+import org.example.exceptions.InvalidPasswordRuntimeException;
+import org.example.exceptions.InvalidUserExceptions;
 import org.example.model.*;
 
 import java.util.HashMap;
@@ -173,8 +176,8 @@ public class Main {
         System.out.print("PASSWORD: ");
         String password = scanner.nextLine().strip().toLowerCase();
         switch (library.loginLibrarian(email, password)) {
-            case USER_DOES_NOT_EXIST -> System.out.println("user does not exist or invalid email");
-            case INVALID_PASSWORD -> System.out.println("invalid password please try again");
+            case USER_DOES_NOT_EXIST -> throw new InvalidUserExceptions("user does not exist");
+            case INVALID_PASSWORD -> throw new InvalidPasswordRuntimeException("invalid password please try again");
             case LOGIN_SUCCESSFUL -> librarianServeBookDashboard(library, email);
         }
     }
@@ -199,8 +202,8 @@ public class Main {
         System.out.print("PASSWORD: ");
         String password = scanner.nextLine().strip().toLowerCase();
         switch (library.loginAccount(email, password)) {
-            case USER_DOES_NOT_EXIST -> System.out.println("user does not exist or invalid email");
-            case INVALID_PASSWORD -> System.out.println("invalid password please try again");
+            case USER_DOES_NOT_EXIST -> throw new RuntimeException("user does not exist ");
+            case INVALID_PASSWORD -> throw new InvalidPasswordRuntimeException("invalid password please try again");
             case LOGIN_SUCCESSFUL -> requestBookDashboard(library, email);
         }
     }
@@ -229,7 +232,7 @@ public class Main {
         String bookGenre = scanner.nextLine();
         //i am also going to create a file and add all the history of borrowed book
         switch (library.requestBook(bookName, bookGenre)) {
-            case GENRE_NOT_FOUND -> System.out.println("this genre that you have looking for does not exist");
+            case GENRE_NOT_FOUND -> throw new GenreNotFoundRuntimeException("this genre does not exist");
             case BOOK_HAS_BEEN_BORROWED -> System.out.println("this book has been borrowed");
             case BOOK_DOES_NOT_EXIST -> System.out.println("this book does not exist");
             case BOOK_REQUESTED_SUCCESSFULLY -> {
@@ -249,14 +252,10 @@ public class Main {
         } else if (library.getLibraryUsers().get(requesterEmail).getIdentity().equals("student")) {
 
             switch (library.getLibraryUsers().get(requesterEmail).getLevel()) {
-                case "400" ->
-                        library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 2, arrivalCounter));
-                case "300" ->
-                        library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 3, arrivalCounter));
-                case "200" ->
-                        library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 4, arrivalCounter));
-                case "100" ->
-                        library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 5, arrivalCounter));
+                case "400" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 2, arrivalCounter));
+                case "300" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 3, arrivalCounter));
+                case "200" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 4, arrivalCounter));
+                case "100" -> library.getRequestBook().offer(new RequestObject(bookName, bookGenre, requesterEmail, 5, arrivalCounter));
                 default -> System.out.println("this does not exist");
             }
         } else {

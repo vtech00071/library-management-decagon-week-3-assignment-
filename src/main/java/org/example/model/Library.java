@@ -3,6 +3,7 @@ package org.example.model;
 import org.example.enums.AccountCreationMessage;
 import org.example.enums.LoginMessage;
 import org.example.enums.RequestBookOutcome;
+import org.example.exceptions.InvalidPasswordRuntimeException;
 import org.example.util.CreateAccountServices;
 import org.example.util.LoginServices;
 
@@ -104,6 +105,7 @@ public class Library implements LoginServices, CreateAccountServices {
     }
 
     //this is the method for login students
+    //throws is only needed in checked exception and you only use it if you are not ready to handle the exceptions
     @Override
     public LoginMessage loginAccount(String email, String password) {
         if (!this.libraryUsers.containsKey(email)) {
@@ -116,7 +118,7 @@ public class Library implements LoginServices, CreateAccountServices {
     }
 
     //this method is for librarian login
-    public LoginMessage loginLibrarian(String email, String password) {
+    public LoginMessage loginLibrarian(String email, String password)  {
         if (!this.librarians.containsKey(email)) {
             return USER_DOES_NOT_EXIST;
         }
