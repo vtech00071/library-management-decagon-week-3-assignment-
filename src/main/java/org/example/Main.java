@@ -1,8 +1,6 @@
 package org.example;
 
-import org.example.exceptions.GenreNotFoundRuntimeException;
-import org.example.exceptions.InvalidPasswordRuntimeException;
-import org.example.exceptions.InvalidUserExceptions;
+import org.example.exceptions.*;
 import org.example.model.*;
 
 import java.util.HashMap;
@@ -233,8 +231,8 @@ public class Main {
         //i am also going to create a file and add all the history of borrowed book
         switch (library.requestBook(bookName, bookGenre)) {
             case GENRE_NOT_FOUND -> throw new GenreNotFoundRuntimeException("this genre does not exist");
-            case BOOK_HAS_BEEN_BORROWED -> System.out.println("this book has been borrowed");
-            case BOOK_DOES_NOT_EXIST -> System.out.println("this book does not exist");
+            case BOOK_HAS_BEEN_BORROWED -> throw new BookHasBeenBorrowed("this book has previously been borrowed ");
+            case BOOK_DOES_NOT_EXIST -> throw new BookDoesNotExist("this book does not exist");
             case BOOK_REQUESTED_SUCCESSFULLY -> {
                 System.out.println("this book has been requested successfully ");
                 //this method will add the books inside the queue
